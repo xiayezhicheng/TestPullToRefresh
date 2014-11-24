@@ -49,8 +49,8 @@ public class CustomApplcation extends Application {
 		//磁盘缓存：如配置了diskCacheSize和diskCacheFileCount，就使用的是LruDiscCache，否则使用的是UnlimitedDiscCache
 		ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(context)
 					.threadPoolSize(1)
-					.threadPriority(Thread.NORM_PRIORITY-1)
-					.threadPoolSize(4)
+					.threadPriority(Thread.NORM_PRIORITY-2)
+					.threadPoolSize(3)
 					.denyCacheImageMultipleSizesInMemory()// 拒绝缓存同一图片，有不同的大小  
 					.memoryCache(new LruMemoryCache(10*1024*1024))
 					.diskCacheFileNameGenerator(new Md5FileNameGenerator())

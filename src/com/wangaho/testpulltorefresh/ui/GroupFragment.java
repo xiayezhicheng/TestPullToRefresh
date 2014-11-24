@@ -9,12 +9,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.wangaho.testpulltorefresh.R;
 import com.wangaho.testpulltorefresh.adapter.GroupAdapter;
 import com.wangaho.testpulltorefresh.bean.Group;
-import com.wangaho.testpulltorefresh.data.GsonRequest;
 import com.wangaho.testpulltorefresh.utils.CommonUtils;
 import com.wangaho.testpulltorefresh.vendor.API;
 import com.wangaho.testpulltorefresh.widget.ListViewUtils;
@@ -24,12 +21,10 @@ import com.wangaho.testpulltorefresh.widget.PullRefreshLayout;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -44,6 +39,7 @@ public class GroupFragment extends BaseFragment {
 	private LinkedList<Group> data;
 	private GroupAdapter adapter;
 	private View emptyView;
+	private View invalidateNetView;
 	private int mPage = 0;
 	private int mCount = 5;
 
@@ -61,8 +57,26 @@ public class GroupFragment extends BaseFragment {
 		adapter = new GroupAdapter(context, data);
 		mListView.setAdapter(adapter);
 		
-		emptyView = View.inflate(getActivity(), R.layout.empty_view, null);
-		View invalidateNetView = View.inflate(getActivity(), R.layout.invalidate_network, null);
+		emptyView = inflater.inflate(R.layout.empty_view, null);
+		emptyView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				layout.setRefreshing(true);
+				loadFirstPage();
+			}
+		});
+		((ViewGroup)mListView.getParent()).addView(emptyView,1);
+		invalidateNetView = inflater.inflate(R.layout.invalidate_network, null);
+		invalidateNetView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				layout.setRefreshing(true);
+				loadFirstPage();
+			}
+		});
+		((ViewGroup)mListView.getParent()).addView(invalidateNetView,2);
 		
 		layout = (PullRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
 		layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
@@ -140,8 +154,7 @@ public class GroupFragment extends BaseFragment {
 									data.clear();
 									layout.setRefreshing(false);
 									if(result.size()==0){
-										((ViewGroup)mListView.getParent()).addView(emptyView);
-										mListView.setEmptyView(emptyView);
+										emptyView.setVisibility(View.VISIBLE);
 									}
 								}
 								if(result.size()<mCount){
@@ -166,7 +179,7 @@ public class GroupFragment extends BaseFragment {
 					}
 					if (!CommonUtils.isNetworkAvailable(context)) {
 						if(isRefreshFromTop){
-							
+							invalidateNetView.setVisibility(View.VISIBLE);
 						}else{
 							Toast.makeText(getActivity(), "网络无连接，请连接后重试", Toast.LENGTH_SHORT).show();
 						}
@@ -186,8 +199,15 @@ public class GroupFragment extends BaseFragment {
 	}
 
 	private void loadFirstPage() {
+		if (emptyView.isShown()) {
+			emptyView.setVisibility(View.GONE);
+		}
+		if (invalidateNetView.isShown()) {
+			invalidateNetView.setVisibility(View.GONE);
+		}
 		mPage = 0;
 		loadData(mPage);
+		
 	}
 
 	public void loadFirstPageAndScrollToTop() {
