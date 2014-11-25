@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="36dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="9dp">
 
     <ImageView
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:id="@+id/progressBar"
         android:layout_gravity="center"
         android:src="@drawable/footerloading"/>
-
+	<TextView
+        android:id="@+id/txt_invalidatenet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="#383838"
+        android:textSize="12sp"/>
 </FrameLayout>

@@ -16,19 +16,22 @@ import com.wangaho.testpulltorefresh.utils.CommonUtils;
 import com.wangaho.testpulltorefresh.vendor.API;
 import com.wangaho.testpulltorefresh.widget.ListViewUtils;
 import com.wangaho.testpulltorefresh.widget.LoadingFooter;
+import com.wangaho.testpulltorefresh.widget.LoadingFooter.onClickLoadListener;
 import com.wangaho.testpulltorefresh.widget.PullRefreshLayout;
+import com.wangaho.testpulltorefresh.widget.LoadingFooter.State;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.Toast;
+import android.widget.AbsListView.OnScrollListener;
 
 public class GroupFragment extends BaseFragment {
 
@@ -41,7 +44,7 @@ public class GroupFragment extends BaseFragment {
 	private View emptyView;
 	private View invalidateNetView;
 	private int mPage = 0;
-	private int mCount = 5;
+	private int mCount = 8;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,15 +52,8 @@ public class GroupFragment extends BaseFragment {
 		context = getActivity();
 		View view = inflater.from(context).inflate(R.layout.activity_list, null);
 
-		mListView = (ListView) view.findViewById(R.id.recyclerView);
-		mLoadingFooter = new LoadingFooter(context);
-		mListView.addFooterView(mLoadingFooter.getView());
-
-		data = new LinkedList<Group>();
-		adapter = new GroupAdapter(context, data);
-		mListView.setAdapter(adapter);
-		
-		emptyView = inflater.inflate(R.layout.empty_view, null);
+		//空内容展示
+		emptyView = view.findViewById(R.id.empty_group);
 		emptyView.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -66,8 +62,9 @@ public class GroupFragment extends BaseFragment {
 				loadFirstPage();
 			}
 		});
-		((ViewGroup)mListView.getParent()).addView(emptyView,1);
-		invalidateNetView = inflater.inflate(R.layout.invalidate_network, null);
+		
+		//无网络连接展示
+		invalidateNetView = view.findViewById(R.id.invalidatenet_group);
 		invalidateNetView.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -76,7 +73,21 @@ public class GroupFragment extends BaseFragment {
 				loadFirstPage();
 			}
 		});
-		((ViewGroup)mListView.getParent()).addView(invalidateNetView,2);
+		
+		mListView = (ListView) view.findViewById(R.id.recyclerView);
+		mLoadingFooter = new LoadingFooter(context);
+		mLoadingFooter.setOnClickLoadListener(new onClickLoadListener() {
+			
+			@Override
+			public void onClick() {
+				loadNextPage();
+			}
+		});
+		mListView.addFooterView(mLoadingFooter.getView());
+		
+		data = new LinkedList<Group>();
+		adapter = new GroupAdapter(context, data);
+		mListView.setAdapter(adapter);
 		
 		layout = (PullRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
 		layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
@@ -97,17 +108,19 @@ public class GroupFragment extends BaseFragment {
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
 
-				if (mLoadingFooter.getState() == LoadingFooter.State.Loading
-						|| mLoadingFooter.getState() == LoadingFooter.State.TheEnd) {
-					return;
+				if (mLoadingFooter.getState() == LoadingFooter.State.Idle) {
+					if (firstVisibleItem + visibleItemCount >= totalItemCount
+							&& totalItemCount != 0
+							&& totalItemCount != mListView.getHeaderViewsCount()+mListView.getFooterViewsCount()
+							&& adapter.getCount() > 0) {
+						loadNextPage();
+					}
+				}else if (mLoadingFooter.getState() == LoadingFooter.State.InvalidateNet) {
+					if (!mLoadingFooter.getView().isShown()) {
+						mLoadingFooter.setState(LoadingFooter.State.Idle);
+					}
 				}
 
-				if (firstVisibleItem + visibleItemCount >= totalItemCount
-						&& totalItemCount != 0
-						&& totalItemCount != mListView.getHeaderViewsCount()+mListView.getFooterViewsCount()
-						&& adapter.getCount() > 0) {
-					loadNextPage();
-				}
 			}
 		});
 		
@@ -162,6 +175,7 @@ public class GroupFragment extends BaseFragment {
 								}else{
 									mLoadingFooter.setState(LoadingFooter.State.Idle);
 								}
+								mPage = page;
 								data.addAll(result);
 								adapter.notifyDataSetChanged();
 							}
@@ -175,13 +189,17 @@ public class GroupFragment extends BaseFragment {
 					if (isRefreshFromTop) {
 						layout.setRefreshing(false);
 					} else {
-						mLoadingFooter.setState(LoadingFooter.State.Idle,2400);
+						mLoadingFooter.setState(LoadingFooter.State.Idle);
 					}
 					if (!CommonUtils.isNetworkAvailable(context)) {
 						if(isRefreshFromTop){
-							invalidateNetView.setVisibility(View.VISIBLE);
+							if (data.isEmpty()) {
+								invalidateNetView.setVisibility(View.VISIBLE);
+							}else {
+								Toast.makeText(context, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+							}
 						}else{
-							Toast.makeText(getActivity(), "网络无连接，请连接后重试", Toast.LENGTH_SHORT).show();
+							mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
 						}
 					
 					}
@@ -195,14 +213,15 @@ public class GroupFragment extends BaseFragment {
 
 	private void loadNextPage() {
 		mLoadingFooter.setState(LoadingFooter.State.Loading);
-		loadData(++mPage);
+		loadData(mPage+1);
+		Log.i("最后load", "你点击了，你懂么");
 	}
 
 	private void loadFirstPage() {
-		if (emptyView.isShown()) {
+		if (emptyView.getVisibility()==View.VISIBLE) {
 			emptyView.setVisibility(View.GONE);
 		}
-		if (invalidateNetView.isShown()) {
+		if (invalidateNetView.getVisibility()==View.VISIBLE) {
 			invalidateNetView.setVisibility(View.GONE);
 		}
 		mPage = 0;

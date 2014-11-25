@@ -42,7 +42,7 @@ public class RentalFragment extends BaseFragment{
 	private LinkedList<Rental> data;
 	private RentalAdapter adapter;
 	private int mPage = 0;
-	private int mCount = 5;
+	private int mCount = 8;
 	private boolean isVisible ;
 	private boolean isInit ;
 

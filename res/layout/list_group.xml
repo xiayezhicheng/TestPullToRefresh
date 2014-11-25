@@ -1,64 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="10dp" >
-
-    <ImageView
-        android:id="@+id/img_group"
-        android:layout_width="130dp"
-        android:layout_height="95dp"
-        android:layout_centerVertical="true"
-        android:scaleType="centerCrop" />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="95dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:layout_toRightOf="@id/img_group" >
-
-        <TextView
-            android:id="@+id/txt_title_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1.3"
-            android:lines="2"
-            android:text="抢占大黑山 岚山著作每周特价房源乐优居亲情派送"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/txt_group_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txt_title_group"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:text="地址"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/txt_group_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txt_group_address"
-            android:gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:text="元/平方米"
-            android:textColor="@color/red"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/txt_content_group_people"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txt_group_address"
-            android:gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:text="已参加：16人"
-            android:textSize="13sp" />
-    </RelativeLayout>
-
-</RelativeLayout>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res/com.wangaho.testpulltorefresh"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardPreventCornerOverlap="true"
+        app:cardElevation="3dp"
+        app:contentPadding="3dp">	
+	<RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/list_selector"
+	    android:paddingBottom="10dp" >
+	
+	    <ImageView
+	        android:id="@+id/img_group"
+	        android:layout_width="130dp"
+	        android:layout_height="95dp"
+	        android:layout_centerVertical="true"
+	        android:scaleType="centerCrop" />
+	
+	    <RelativeLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="95dp"
+	        android:paddingLeft="5dp"
+	        android:paddingRight="5dp"
+	        android:layout_toRightOf="@id/img_group" >
+	
+	        <TextView
+	            android:id="@+id/txt_title_group"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:ellipsize="end"
+	            android:lineSpacingMultiplier="1.3"
+	            android:lines="2"
+	            android:text="抢占大黑山 岚山著作每周特价房源乐优居亲情派送"
+	            android:textSize="15sp" />
+	
+	        <TextView
+	            android:id="@+id/txt_group_address"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_below="@id/txt_title_group"
+	            android:gravity="center_vertical"
+	            android:maxLines="1"
+	            android:text="地址"
+	            android:textSize="13sp" />
+	
+	        <TextView
+	            android:id="@+id/txt_group_price"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_below="@id/txt_group_address"
+	            android:gravity="bottom"
+	            android:layout_alignParentBottom="true"
+	            android:text="元/平方米"
+	            android:textColor="@color/red"
+	            android:textSize="15sp" />
+	
+	        <TextView
+	            android:id="@+id/txt_content_group_people"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_below="@id/txt_group_address"
+	            android:gravity="bottom"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentRight="true"
+	            android:text="已参加：16人"
+	            android:textSize="13sp" />
+	    </RelativeLayout>
+	</RelativeLayout>
+</android.support.v7.widget.CardView>
